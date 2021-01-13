@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="css/bootstrap.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+    <div class="container-lg">
+        <form id="formulario">
+            <div class="container">
+                <br>
+                <div class="col-md-8 order-md-1">
+                    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
+                        <h1 class="h2">Agregar Cliente</h1>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-4">
+                        <label class="margen" for="rut">Rut:</label>
+                        <input type="text" class="form-control" id="rut" placeholder="11111111-1">
+                    </div>
+                    <div class="col-sm-4">
+                        <label class="margen" for="nombre">Nombre cliente:</label>
+                        <input type="text" class="form-control" id="nombre" placeholder="Ingrese nombre">
+                    </div>
+                    <div class="col-sm-4">
+                        <label class="margen" for="direccion">Direccion:</label>
+                        <input type="text" class="form-control" id="direccion" placeholder="Ingrese dirección">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-4">
+                        <label class="margen" for="celular">Celular:</label>
+                        <input type="text" class="form-control" id="celular" maxlength="9" placeholder="999999999">
+                    </div>
+                    <div class="col-sm-4">
+                        <label class="margen" for="fecha de nacimiento">fecha de nacimiento:</label>
+                        <input type="date" id="fecha_nacimiento" class="form-control">
+                    </div>
+                    <div class="col-sm-4" hidden="true">
+                        <label class="margen" for="fecha mañana">fecha de nacimiento:</label>
+                        <input type="date" id="mañana" class="form-control">
+                    </div>
+                    <div class="col-sm-4">
+                        <label class="margen" for="email">Email:<span class="text-muted"></span></label>
+                        <input type="email" id="correo" name="email" class="in form-control" placeholder="persona@email.com">
+                        <div class="invalid-feedback">
+                            Por favor ingrese un email valido!!!
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-4">
+                        <label class="margen" for="estadoCivil">Estado Civil:</label>
+                        <select id="estadoCivil" class="custom-select d-block w-100" style="width: 260px">
+                        <option>Soltero</option>
+                        <option>Casado</option>
+                        <option>Divorciado</option>
+                        <option>Viudo</option>
+                    </select>
+                    </div>
+                    <div class="col-sm-4">
+                        <label class="margen" for="clave">Clave:</label>
+                        <input type="password" class="form-control" id="clave">
+                    </div>
+                    <div class="col-sm-4">
+                        <label class="margen" for="clave">Repetir clave:</label>
+                        <input type="password" class="form-control" id="clave2">
+                    </div>
+                </div>
+                <div class="col-sm-4"></div>
+
+
+                <div>
+                    <label></label>
+                    <button class="btn-primary btn-lg btn-block" type="button" onclick="guardar()">Guardar</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+
+
+    <script src="js/jquery.min.js"></script>
+    <script>
+        $(document).ready(function() {
+
+            getFechas();
+        });
+
+        function getFechas() {
+
+            var fechaDesde = new Date();
+            var mesDesde = fechaDesde.getMonth() + 1;
+            var diaDesde = fechaDesde.getDate();
+            var anioDesde = fechaDesde.getFullYear();
+            if (diaDesde < 10)
+                diaDesde = '0' + diaDesde;
+            if (mesDesde < 10)
+                mesDesde = '0' + mesDesde
+
+
+            document.getElementById("fecha_nacimiento").value = anioDesde + "-" + mesDesde + "-" + diaDesde;
+
+            var mañana = new Date();
+            var mesDesde = mañana.getMonth() + 1;
+            var diaDesde = mañana.getDate();
+            var anioDesde = mañana.getFullYear();
+            if (diaDesde < 10)
+                diaDesde = '0' + diaDesde;
+            if (mesDesde < 10)
+                mesDesde = '0' + mesDesde
+
+
+            document.getElementById("mañana").value = anioDesde + "-" + mesDesde + "-" + diaDesde;
+        }
+
+        function guardar() {
+
+            if (!validarRut(document.getElementById("rut").value)) {
+                alert("El rut del cliente es invalido");
+                return;
+            }
+            var bool = $('.in').toArray().some(function(el) { /* validacion de campos vacios*/
+                return $(el).val().length < 1
+            });
+
+            if (bool) {
+                alert("Debe completar todos los datos del formulario");
+                return;
+            }
+
+            if (document.getElementById("clave").value != document.getElementById("clave2").value) {
+                alert("Las claves no coinciden");
+                return;
+            }
+
+            if (document.getElementById("fecha_nacimiento").value > document.getElementById("mañana").value) {
+                alert("Fecha de nacimiento incorrecta");
+                return;
+            }
+
+            var rut = $('#rut').val();
+            var nombre = $('#nombre').val();
+            var direccion = $('#direccion').val();
+            var celular = $('#celular').val();
+            var fecha_nacimiento = $('#fecha_nacimiento').val();
+            var estadoCivil = $('#estadoCivil').val();
+            var correo = $('#correo').val();
+            var clave = $('#clave').val();
+            var mensaje = "";
+
+            $.ajax({
+                url: 'http://localhost:64618/api/cliente',
+                method: 'POST',
+                data: {
+                    "rut": rut,
+                    "nombre": nombre,
+                    "direccion": direccion,
+                    "celular": celular,
+                    "fecha_nac": fecha_nacimiento,
+                    "mail": correo,
+                    "estado": estadoCivil,
+                    "clave": clave
+                },
+                success: function(result, status, xhr) {
+                    console.log(result);
+                    if (result.mensaje == "OK") {
+                        alert("Cliente ingresado satisfactoriamente");
+                        location.href = "index.html";
+                    } else {
+                        alert("Error al ingresar cliente");
+                    }
+                },
+                error: function(xhr, status) {
+                    console.log('fallo la solicitud', status);
+                }
+            })
+
+        }
+
+
+
+        function validarRut(rutCompleto) {
+            if (!/^[0-9]+[-|‐]{1}[0-9kK]{1}$/.test(rutCompleto))
+                return false;
+            var tmp = rutCompleto.split('-');
+            var digv = tmp[1];
+            var rut = tmp[0];
+            if (digv == 'K') digv = 'k';
+            return (validarVerificador(rut) == digv);
+        }
+
+        function validarVerificador(T) {
+            var M = 0,
+                S = 1;
+            for (; T; T = Math.floor(T / 10))
+                S = (S + T % 10 * (9 - M++ % 6)) % 11;
+            return S ? S - 1 : 'k';
+        }
+    </script>
+</body>
+
+</html>

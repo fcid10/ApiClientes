@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inicio</title>
+    <link rel="stylesheet" href="css/bootstrap.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <div class="container-md">
+        <div class="container">
+            <br>
+            <div class="col-md-8 order-md-1">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
+                    <h1 class="h2">Datos Cliente</h1>
+                </div>
+            </div>
+            <div class="row">
+                <div>
+                    <label></label>
+                    <button class="btn-primary btn-lg btn-block" type="button" onclick="agregar()">Nuevo cliente</button>
+                </div>
+            </div>
+            <br>
+            <div class="row">
+                <div class="col-sm-4">
+                    <label class="margen" for="nombre">Rut cliente:</label>
+                    <input type="text" class="form-control" id="rut" placeholder="Ingrese rut">
+                </div>
+                <div>
+                    <label></label>
+                    <button class="btn-primary btn-lg btn-block" method="GET" type="button" onclick="buscar()">Buscar</button>
+                </div>
+            </div>
+            <br>
+            <div class="table table-striped">
+                <table class="table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Rut</th>
+                            <th>Nombre</th>
+                            <th>Direccion</th>
+                            <th>Celular</th>
+                            <th>Fecha de nacimiento</th>
+                            <th>Correo</th>
+                            <th>Estado civil</th>
+                            <th>Clave</th>
+                        </tr>
+                    </thead>
+                    <tbody id="datos">
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/jquery.min.js"></script>
+    <script>
+        $(document).ready(function() {
+
+            getClientes();
+
+        });
+
+        function getClientes() {
+
+            $.ajax({
+                url: 'http://localhost:64618/api/clientes',
+                type: 'GET',
+                dataType: 'json',
+                success: function(result, status, xhr) {
+                    let html = '';
+                    for (let item of result.data) {
+                        html += '<tr>';
+                        html += '<td >' + item.rut + '</td>';
+                        html += '<td >' + item.nombre + '</td>';
+                        html += '<td >' + item.direccion + '</td>';
+                        html += '<td >' + item.celular + '</td>';
+                        html += '<td >' + item.fecha_nac + '</td>';
+                        html += '<td >' + item.mail + '</td>';
+                        html += '<td >' + item.estado + '</td>';
+                        html += '<td >' + item.clave + '</td>';
+                        html += '</tr>';
+                    }
+                    $('#datos').html(html);
+                },
+                error: function(xhr, status) {
+                    console.log('fallo la solicitud');
+                }
+            })
+
+        }
+
+        $('datos').on('click', 'span.delete', function() {
+            $(this).parents('tr').remove();
+        });
+
+        function agregar() {
+            location.href = "agregar.html";
+        }
+
+        function buscar() {
+            var rut = $('#rut').val();
+            $.ajax({
+                url: 'http://localhost:64618/api/cliente?rut=' + rut + '',
+                type: 'GET',
+                dataType: 'json',
+                success: function(result, status, xhr) {
+                    console.log(result)
+                    let html = '';
+                    if (result.data.rut == null) {
+                        alert("No se encontro resultado asociado a ese rut de cliente");
+                        location.href = "index.html";
+                    } else {
+                        html += '<tr>';
+                        html += '<td >' + result.data.rut + '</td>';
+                        html += '<td >' + result.data.nombre + '</td>';
+                        html += '<td >' + result.data.direccion + '</td>';
+                        html += '<td >' + result.data.celular + '</td>';
+                        html += '<td >' + result.data.fecha_nac + '</td>';
+                        html += '<td >' + result.data.mail + '</td>';
+                        html += '<td >' + result.data.estado + '</td>';
+                        html += '<td >' + result.data.clave + '</td>';
+                        html += '</tr>';
+                    }
+
+                    $('#datos').html(html);
+                },
+                error: function(xhr, status) {
+                    console.log('fallo la solicitud');
+                }
+            })
+        }
+    </script>
+</body>
+
+</html>
